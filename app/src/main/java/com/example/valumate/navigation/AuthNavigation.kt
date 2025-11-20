@@ -10,10 +10,9 @@ import com.example.valumate.screen.ResetPasswordOtpScreen
 import com.example.valumate.screen.ResetPasswordScreen
 import com.example.valumate.screen.SignupScreen
 import com.example.valumate.screen.VerifyEmailOtpScreen
-import com.example.valumate.viewmodel.AuthViewModel
 
 @Composable
-fun AuthNavigation(navHostController: NavHostController, authViewModel: AuthViewModel) {
+fun AuthNavigation(navHostController: NavHostController) {
     NavHost(navController = navHostController, startDestination = MainRoutes.LOGIN) {
         composable(MainRoutes.LOGIN) {
             LoginScreen(navHostController)

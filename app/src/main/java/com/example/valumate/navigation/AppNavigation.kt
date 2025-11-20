@@ -22,10 +22,9 @@ import com.example.valumate.screen.ReviewUploadScreen
 import com.example.valumate.screen.SettingsScreen
 import com.example.valumate.screen.UploadChecklistScreen
 import com.example.valumate.screen.ViewProfileScreen
-import com.example.valumate.viewmodel.AuthViewModel
 
 @Composable
-fun AppNavigation(navHostController: NavHostController, authViewModel: AuthViewModel) {
+fun AppNavigation(navHostController: NavHostController) {
     NavHost(navController = navHostController, startDestination = MainRoutes.DASHBOARD) {
         composable(MainRoutes.ABOUT_BUSINESS) {
             AboutBusinessScreen(navHostController)
@@ -73,7 +72,7 @@ fun AppNavigation(navHostController: NavHostController, authViewModel: AuthViewM
             ReviewUploadScreen(navHostController)
         }
         composable(MainRoutes.SETTINGS) {
-            SettingsScreen(navHostController, authViewModel)
+            SettingsScreen(navHostController)
         }
         composable(MainRoutes.UPLOAD_CHECKLIST) {
             UploadChecklistScreen(navHostController)

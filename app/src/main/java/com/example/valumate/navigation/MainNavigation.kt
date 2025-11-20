@@ -2,19 +2,15 @@ package com.example.valumate.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
 import com.example.valumate.screen.WelcomeScreen
-import com.example.valumate.viewmodel.AuthViewModel
 import kotlinx.coroutines.delay
 
 @Composable
-fun MainNavigation(authViewModel: AuthViewModel = hiltViewModel()) {
-    val isLoggedIn = authViewModel.isLoggedIn.collectAsState()
+fun MainNavigation() {
 
     val navController: NavHostController = rememberNavController()
 
@@ -28,10 +24,10 @@ fun MainNavigation(authViewModel: AuthViewModel = hiltViewModel()) {
     if (showWelcome.value) {
         WelcomeScreen(navController)
     } else {
-        if (isLoggedIn.value) {
-            AppNavigation(navController, authViewModel)
+        if (false) {
+            AppNavigation(navController)
         } else {
-            AuthNavigation(navController, authViewModel)
+            AuthNavigation(navController)
         }
     }
 }

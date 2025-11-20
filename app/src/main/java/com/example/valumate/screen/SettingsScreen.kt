@@ -30,10 +30,9 @@ import com.example.valumate.navigation.MainRoutes
 import com.example.valumate.shared.CustomButton
 import com.example.valumate.shared.CustomText
 import com.example.valumate.ui.theme.AppColors
-import com.example.valumate.viewmodel.AuthViewModel
 
 @Composable
-fun SettingsScreen(navHostController: NavHostController, authViewModel: AuthViewModel) {
+fun SettingsScreen(navHostController: NavHostController) {
     val settingsOptions = arrayOf(
         "My Profile",
         "Contact Us",
@@ -115,11 +114,9 @@ fun SettingsScreen(navHostController: NavHostController, authViewModel: AuthView
             backgroundColor = AppColors.Light,
             textColor = AppColors.MidnightBlue,
             onClick = {
-                authViewModel.logout()
             })
         Spacer(modifier = Modifier.height(10.dp))
         CustomButton(text = "Delete Account", onClick = {
-            authViewModel.logout()
         })
     }
 }

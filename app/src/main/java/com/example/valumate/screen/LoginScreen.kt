@@ -48,7 +48,26 @@ fun LoginScreen(
     val emailAddress = remember { mutableStateOf("") }
     val password = remember { mutableStateOf("") }
 
+    val emailAddressError = remember { mutableStateOf<String?>(null) }
+    val passwordError = remember { mutableStateOf<String?>(null) }
+
     fun login() {
+        emailAddressError.value = null
+        passwordError.value = null
+
+        var isValid = true
+
+        if (emailAddress.value.isBlank()) {
+            emailAddressError.value = "Email is required"
+            isValid = false
+        }
+        if (password.value.isBlank()) {
+            passwordError.value = "Password is required"
+            isValid = false
+        }
+
+        if (!isValid) return
+
         val loginRequestModel = LoginRequestModel(
             email_address = emailAddress.value, password = password.value
         )
@@ -115,7 +134,13 @@ fun LoginScreen(
                 value = emailAddress.value,
                 onValueChange = {
                     emailAddress.value = it
-                }
+                    if (it.isNotBlank()) {
+                        emailAddressError.value = null
+                    } else {
+                        emailAddressError.value = "Email is required"
+                    }
+                },
+                errorMessage = emailAddressError.value
             )
             Spacer(modifier = Modifier.height(20.dp))
             CustomText(
@@ -131,7 +156,13 @@ fun LoginScreen(
                 value = password.value,
                 onValueChange = {
                     password.value = it
-                }
+                    if (it.isNotBlank()) {
+                        passwordError.value = null
+                    } else {
+                        passwordError.value = "Password is required"
+                    }
+                },
+                errorMessage = passwordError.value
             )
             Spacer(modifier = Modifier.height(15.dp))
             CustomText(
