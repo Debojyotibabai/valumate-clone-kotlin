@@ -26,7 +26,9 @@ fun CustomTextField(
     placeholderText: String,
     bordered: Boolean = false,
     keyboardType: KeyboardType = KeyboardType.Text,
-    minLines: Int = 1
+    minLines: Int = 1,
+    value: String = "",
+    onValueChange: (String) -> Unit = {}
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val isFocused by interactionSource.collectIsFocusedAsState()
@@ -50,12 +52,12 @@ fun CustomTextField(
     ) {
         if (leadingIcon != null) {
             OutlinedTextField(
-                value = "",
+                value = value,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = keyboardType
                 ),
                 minLines = minLines,
-                onValueChange = {},
+                onValueChange = onValueChange,
                 placeholder = {
                     CustomText(
                         placeholderText,
@@ -83,12 +85,12 @@ fun CustomTextField(
             )
         } else {
             OutlinedTextField(
-                value = "",
+                value = value,
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = keyboardType
                 ),
                 minLines = minLines,
-                onValueChange = {},
+                onValueChange = onValueChange,
                 placeholder = {
                     CustomText(
                         placeholderText,

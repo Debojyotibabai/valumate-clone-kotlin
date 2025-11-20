@@ -16,7 +16,7 @@ import com.example.valumate.viewmodel.AuthViewModel
 fun AuthNavigation(navHostController: NavHostController, authViewModel: AuthViewModel) {
     NavHost(navController = navHostController, startDestination = MainRoutes.LOGIN) {
         composable(MainRoutes.LOGIN) {
-            LoginScreen(navHostController, authViewModel)
+            LoginScreen(navHostController)
         }
         composable(MainRoutes.FORGOT_PASSWORD) {
             ForgotPasswordScreen(navHostController)
