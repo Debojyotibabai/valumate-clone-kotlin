@@ -1,5 +1,6 @@
 package com.example.valumate.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -16,8 +17,11 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -34,6 +38,7 @@ import com.example.valumate.shared.CustomText
 import com.example.valumate.shared.CustomTextField
 import com.example.valumate.ui.theme.AppColors
 import com.example.valumate.ui.theme.Poppins
+import com.example.valumate.utils.AppRegex
 
 @Composable
 fun SignupScreen(navHostController: NavHostController) {
@@ -44,6 +49,59 @@ fun SignupScreen(navHostController: NavHostController) {
         "At least one special symbol (!@#^*_?{}-)",
         "Minimum of 8 characters"
     )
+
+    val emailAddress = remember { mutableStateOf("") }
+    val password = remember { mutableStateOf("") }
+    val confirmPassword = remember { mutableStateOf("") }
+
+    val isAgeConfirmed = remember { mutableStateOf(false) }
+    val isTermsAccepted = remember { mutableStateOf(false) }
+
+    val emailAddressError = remember { mutableStateOf("") }
+    val passwordError = remember { mutableStateOf("") }
+    val confirmPasswordError = remember { mutableStateOf("") }
+
+    val context = LocalContext.current
+
+    fun signup() {
+        emailAddressError.value = ""
+        passwordError.value = ""
+        confirmPasswordError.value = ""
+
+        if (emailAddress.value.isBlank()) {
+            emailAddressError.value = "Email is required"
+        } else if (!emailAddress.value.matches(AppRegex.emailRegex)) {
+            emailAddressError.value = "Invalid email"
+        }
+
+        if (password.value.isBlank()) {
+            passwordError.value = "Password is required"
+        } else if (!password.value.matches(AppRegex.passwordRegex)) {
+            passwordError.value = "Password must match the criteria"
+        }
+
+        if (confirmPassword.value.isBlank()) {
+            confirmPasswordError.value = "Confirm password is required"
+        } else if (confirmPassword.value != password.value) {
+            confirmPasswordError.value = "Passwords do not match"
+        }
+
+
+        if (emailAddressError.value.isNotBlank() || passwordError.value.isNotBlank() || confirmPasswordError.value.isNotBlank()) {
+            return
+        }
+        if (!isTermsAccepted.value) {
+            Toast.makeText(context, "Please accept the terms and conditions", Toast.LENGTH_LONG)
+                .show()
+            return
+        }
+        if (!isAgeConfirmed.value) {
+            Toast.makeText(context, "Please confirm your age", Toast.LENGTH_LONG).show()
+            return
+        }
+
+        navHostController.navigate(MainRoutes.VERIFY_EMAIL_OTP)
+    }
 
     Column(
         verticalArrangement = Arrangement.Top,
@@ -95,7 +153,20 @@ fun SignupScreen(navHostController: NavHostController) {
             Spacer(modifier = Modifier.height(10.dp))
             CustomTextField(
                 placeholderText = "Enter your email",
-                leadingIcon = R.drawable.mail_icon
+                leadingIcon = R.drawable.mail_icon,
+                value = emailAddress.value,
+                onValueChange = {
+                    emailAddress.value = it
+
+                    if (it.isBlank()) {
+                        emailAddressError.value = "Email is required"
+                    } else if (!it.matches(AppRegex.emailRegex)) {
+                        emailAddressError.value = "Invalid email"
+                    } else {
+                        emailAddressError.value = ""
+                    }
+                },
+                errorMessage = emailAddressError.value
             )
             Spacer(modifier = Modifier.height(20.dp))
             CustomText(
@@ -108,6 +179,19 @@ fun SignupScreen(navHostController: NavHostController) {
             CustomTextField(
                 placeholderText = "8 - 20 characters",
                 leadingIcon = R.drawable.lock_icon,
+                value = password.value,
+                onValueChange = {
+                    password.value = it
+
+                    if (it.isBlank()) {
+                        passwordError.value = "Password is required"
+                    } else if (!it.matches(AppRegex.passwordRegex)) {
+                        passwordError.value = "Password must match the criteria"
+                    } else {
+                        passwordError.value = ""
+                    }
+                },
+                errorMessage = passwordError.value
             )
             Spacer(modifier = Modifier.height(20.dp))
             CustomText(
@@ -120,6 +204,19 @@ fun SignupScreen(navHostController: NavHostController) {
             CustomTextField(
                 placeholderText = "Enter your password again",
                 leadingIcon = R.drawable.lock_icon,
+                value = confirmPassword.value,
+                onValueChange = {
+                    confirmPassword.value = it
+
+                    if (it.isBlank()) {
+                        confirmPasswordError.value = "Confirm password is required"
+                    } else if (it != password.value) {
+                        confirmPasswordError.value = "Passwords do not match"
+                    } else {
+                        confirmPasswordError.value = ""
+                    }
+                },
+                errorMessage = confirmPasswordError.value
             )
             Spacer(modifier = Modifier.height(20.dp))
             passwordConditions.forEach { text ->
@@ -150,11 +247,27 @@ fun SignupScreen(navHostController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                Image(
-                    painter = painterResource(R.drawable.rectangle_unchecked_icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
+                if (isTermsAccepted.value) {
+                    Image(
+                        painter = painterResource(R.drawable.rectangle_checked_icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clickable {
+                                isTermsAccepted.value = !isTermsAccepted.value
+                            }
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.rectangle_unchecked_icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clickable {
+                                isTermsAccepted.value = !isTermsAccepted.value
+                            }
+                    )
+                }
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     buildAnnotatedString {
@@ -190,11 +303,27 @@ fun SignupScreen(navHostController: NavHostController) {
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Start
             ) {
-                Image(
-                    painter = painterResource(R.drawable.rectangle_unchecked_icon),
-                    contentDescription = null,
-                    modifier = Modifier.size(14.dp)
-                )
+                if (isAgeConfirmed.value) {
+                    Image(
+                        painter = painterResource(R.drawable.rectangle_checked_icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clickable {
+                                isAgeConfirmed.value = !isAgeConfirmed.value
+                            }
+                    )
+                } else {
+                    Image(
+                        painter = painterResource(R.drawable.rectangle_unchecked_icon),
+                        contentDescription = null,
+                        modifier = Modifier
+                            .size(14.dp)
+                            .clickable {
+                                isAgeConfirmed.value = !isAgeConfirmed.value
+                            }
+                    )
+                }
                 Spacer(modifier = Modifier.width(10.dp))
                 CustomText(
                     text = "I affirm I am 13 years old or older",
@@ -207,7 +336,7 @@ fun SignupScreen(navHostController: NavHostController) {
         Spacer(modifier = Modifier.height(40.dp))
         CustomButton(
             onClick = {
-                navHostController.navigate(MainRoutes.VERIFY_EMAIL_OTP)
+                signup()
             },
             text = "Verify"
         )
