@@ -41,4 +41,8 @@ class LoginViewModel @Inject constructor(private val loginRepository: LoginRepos
             }
         }
     }
+
+    fun resetLoginState() {
+        _loginResponseData.value = NetworkResponse.Initial
+    }
 }

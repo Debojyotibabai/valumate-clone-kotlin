@@ -80,16 +80,20 @@ fun LoginScreen(
 
     LaunchedEffect(loginState.value) {
         when (val state = loginState.value) {
+            is NetworkResponse.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                loginViewModel.resetLoginState()
+            }
+
             is NetworkResponse.Success -> {
                 Toast.makeText(context, state.data.message, Toast.LENGTH_LONG).show()
                 navHostController.navigate(MainRoutes.DASHBOARD)
+                loginViewModel.resetLoginState()
             }
 
-            is NetworkResponse.Error -> {
-                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+            else -> {
+                loginViewModel.resetLoginState()
             }
-
-            else -> {}
         }
     }
 

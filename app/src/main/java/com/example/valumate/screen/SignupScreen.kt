@@ -17,6 +17,8 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -30,8 +32,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.valumate.R
+import com.example.valumate.model.SignupRequestModel
 import com.example.valumate.navigation.MainRoutes
 import com.example.valumate.shared.CustomButton
 import com.example.valumate.shared.CustomText
@@ -39,9 +43,14 @@ import com.example.valumate.shared.CustomTextField
 import com.example.valumate.ui.theme.AppColors
 import com.example.valumate.ui.theme.Poppins
 import com.example.valumate.utils.AppRegex
+import com.example.valumate.utils.NetworkResponse
+import com.example.valumate.viewmodel.SignupViewModel
 
 @Composable
-fun SignupScreen(navHostController: NavHostController) {
+fun SignupScreen(
+    navHostController: NavHostController,
+    signupViewModel: SignupViewModel = hiltViewModel()
+) {
     val passwordConditions: Array<String> = arrayOf(
         "At least one uppercase letter",
         "At least one lowercase letter",
@@ -62,6 +71,7 @@ fun SignupScreen(navHostController: NavHostController) {
     val confirmPasswordError = remember { mutableStateOf("") }
 
     val context = LocalContext.current
+    val signupState = signupViewModel.signupResponseData.collectAsState()
 
     fun signup() {
         emailAddressError.value = ""
@@ -100,7 +110,34 @@ fun SignupScreen(navHostController: NavHostController) {
             return
         }
 
-        navHostController.navigate(MainRoutes.VERIFY_EMAIL_OTP)
+        signupViewModel.signup(
+            SignupRequestModel(
+                above_thirteen = isAgeConfirmed.value,
+                accept_term_condition = isTermsAccepted.value,
+                email_address = emailAddress.value,
+                password = password.value,
+                confirm_password = confirmPassword.value
+            )
+        )
+    }
+
+    LaunchedEffect(signupState.value) {
+        when (val state = signupState.value) {
+            is NetworkResponse.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                signupViewModel.resetSignupState()
+            }
+
+            is NetworkResponse.Success -> {
+                Toast.makeText(context, state.data.message, Toast.LENGTH_LONG).show()
+                navHostController.navigate(MainRoutes.VERIFY_EMAIL_OTP)
+                signupViewModel.resetSignupState()
+            }
+
+            else -> {
+                signupViewModel.resetSignupState()
+            }
+        }
     }
 
     Column(
@@ -338,7 +375,8 @@ fun SignupScreen(navHostController: NavHostController) {
             onClick = {
                 signup()
             },
-            text = "Verify"
+            text = "Verify",
+            isLoading = signupState.value is NetworkResponse.Loading
         )
         Spacer(modifier = Modifier.height(20.dp))
     }

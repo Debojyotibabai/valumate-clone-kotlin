@@ -24,10 +24,6 @@ fun MainNavigation() {
     if (showWelcome.value) {
         WelcomeScreen(navController)
     } else {
-        if (false) {
-            AppNavigation(navController)
-        } else {
-            AuthNavigation(navController)
-        }
+        AuthNavigation(navController)
     }
 }
