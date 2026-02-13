@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.toRoute
+import com.example.valumate.navigation.typeSafeRoutes.VerifyEmailOtp
 import com.example.valumate.screen.ForgotPasswordScreen
 import com.example.valumate.screen.LoginScreen
 import com.example.valumate.screen.ResetPasswordOtpScreen
@@ -29,8 +31,9 @@ fun AuthNavigation(navHostController: NavHostController) {
         composable(MainRoutes.SIGNUP) {
             SignupScreen(navHostController)
         }
-        composable(MainRoutes.VERIFY_EMAIL_OTP) {
-            VerifyEmailOtpScreen(navHostController)
+        composable<VerifyEmailOtp> { backStackEntry ->
+            val email = backStackEntry.toRoute<VerifyEmailOtp>().email
+            VerifyEmailOtpScreen(navHostController, email = email)
         }
     }
 }

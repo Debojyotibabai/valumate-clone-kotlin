@@ -37,6 +37,7 @@ import androidx.navigation.NavHostController
 import com.example.valumate.R
 import com.example.valumate.model.SignupRequestModel
 import com.example.valumate.navigation.MainRoutes
+import com.example.valumate.navigation.typeSafeRoutes.VerifyEmailOtp
 import com.example.valumate.shared.CustomButton
 import com.example.valumate.shared.CustomText
 import com.example.valumate.shared.CustomTextField
@@ -49,7 +50,7 @@ import com.example.valumate.viewmodel.SignupViewModel
 @Composable
 fun SignupScreen(
     navHostController: NavHostController,
-    signupViewModel: SignupViewModel = hiltViewModel()
+    signupViewModel: SignupViewModel = hiltViewModel(),
 ) {
     val passwordConditions: Array<String> = arrayOf(
         "At least one uppercase letter",
@@ -130,13 +131,11 @@ fun SignupScreen(
 
             is NetworkResponse.Success -> {
                 Toast.makeText(context, state.data.message, Toast.LENGTH_LONG).show()
-                navHostController.navigate(MainRoutes.VERIFY_EMAIL_OTP)
+                navHostController.navigate(VerifyEmailOtp(email = emailAddress.value))
                 signupViewModel.resetSignupState()
             }
 
-            else -> {
-                signupViewModel.resetSignupState()
-            }
+            else -> {}
         }
     }
 

@@ -46,7 +46,7 @@ fun CustomOtpTextField(
     val isFocused =
         remember(count) { mutableStateListOf<Boolean>().apply { repeat(count) { add(false) } } }
 
-    LaunchedEffect(values) {
+    LaunchedEffect(values.toList()) {
         val otp = values.joinToString("")
         onChanged?.invoke(otp)
         if (otp.length == count && values.all { it.isNotEmpty() }) {
@@ -68,7 +68,9 @@ fun CustomOtpTextField(
                     .background(AppColors.Light, RoundedCornerShape(8.dp))
                     .border(
                         width = 1.dp,
-                        color = if (isFocused.getOrNull(i) == true) AppColors.SteelBlue else AppColors.Gray700.copy(alpha = 0.4f),
+                        color = if (isFocused.getOrNull(i) == true) AppColors.SteelBlue else AppColors.Gray700.copy(
+                            alpha = 0.4f
+                        ),
                         shape = RoundedCornerShape(8.dp)
                     )
                     .clickable { focusRequesters[i].requestFocus() }

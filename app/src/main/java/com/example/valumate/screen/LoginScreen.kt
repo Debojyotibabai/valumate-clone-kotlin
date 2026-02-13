@@ -91,9 +91,7 @@ fun LoginScreen(
                 loginViewModel.resetLoginState()
             }
 
-            else -> {
-                loginViewModel.resetLoginState()
-            }
+            else -> {}
         }
     }
 
