@@ -13,10 +13,15 @@ import androidx.compose.ui.Modifier
 import com.example.valumate.navigation.MainNavigation
 import com.example.valumate.ui.theme.AppColors
 import com.example.valumate.ui.theme.ValumateTheme
+import com.example.valumate.utils.DataStoreManager
 import dagger.hilt.android.AndroidEntryPoint
+import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+    @Inject
+    lateinit var dataStoreManager: DataStoreManager
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
@@ -28,7 +33,7 @@ class MainActivity : ComponentActivity() {
                         .windowInsetsPadding(WindowInsets.systemBars),
                     containerColor = AppColors.Gray600,
                 ) { _ ->
-                    MainNavigation()
+                    MainNavigation(dataStoreManager)
                 }
             }
         }

@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.valumate.model.VerifyOtpRequestModel
 import com.example.valumate.model.VerifyOtpResponseModel
 import com.example.valumate.repository.VerifyOtpRepository
+import com.example.valumate.utils.DataStoreManager
 import com.example.valumate.utils.NetworkResponse
 import com.example.valumate.utils.parseError
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -15,7 +16,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class VerifyOtpViewModel @Inject constructor(private val verifyOtpRepository: VerifyOtpRepository) :
+class VerifyOtpViewModel @Inject constructor(
+    private val verifyOtpRepository: VerifyOtpRepository,
+    private val dataStoreManager: DataStoreManager
+) :
     ViewModel() {
     private val _verifyOtpState = MutableStateFlow<NetworkResponse<VerifyOtpResponseModel>>(
         NetworkResponse.Initial
@@ -32,6 +36,9 @@ class VerifyOtpViewModel @Inject constructor(private val verifyOtpRepository: Ve
 
                 if (response.isSuccessful && response.body() != null) {
                     response.body()?.let {
+                        dataStoreManager.saveAccessToken(it.access_token)
+                        dataStoreManager.saveRefreshToken(it.refresh_token)
+
                         _verifyOtpState.value = NetworkResponse.Success(it)
                     }
                 } else {

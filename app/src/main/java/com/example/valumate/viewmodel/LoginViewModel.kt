@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.valumate.model.LoginRequestModel
 import com.example.valumate.model.LoginResponseModel
 import com.example.valumate.repository.LoginRepository
+import com.example.valumate.utils.DataStoreManager
 import com.example.valumate.utils.NetworkResponse
 import com.example.valumate.utils.parseError
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -14,8 +15,10 @@ import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
-class LoginViewModel @Inject constructor(private val loginRepository: LoginRepository) :
-    ViewModel() {
+class LoginViewModel @Inject constructor(
+    private val loginRepository: LoginRepository,
+    private val dataStoreManager: DataStoreManager
+) : ViewModel() {
     private val _loginResponseData = MutableStateFlow<NetworkResponse<LoginResponseModel>>(
         NetworkResponse.Initial
     )
@@ -31,6 +34,9 @@ class LoginViewModel @Inject constructor(private val loginRepository: LoginRepos
 
                 if (response.isSuccessful && response.body() != null) {
                     response.body()?.let {
+                        dataStoreManager.saveAccessToken(it.access_token)
+                        dataStoreManager.saveRefreshToken(it.refresh_token)
+
                         _loginResponseData.value = NetworkResponse.Success(it)
                     }
                 } else {
