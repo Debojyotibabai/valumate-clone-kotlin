@@ -1,5 +1,7 @@
 package com.example.valumate.api
 
+import com.example.valumate.model.ForgotPasswordRequestModel
+import com.example.valumate.model.ForgotPasswordResponseModel
 import com.example.valumate.model.LoginRequestModel
 import com.example.valumate.model.LoginResponseModel
 import com.example.valumate.model.SignupRequestModel
@@ -19,4 +21,7 @@ interface ApiService {
 
     @POST("/auth/verify_otp")
     suspend fun verifyOtp(@Body verifyOtpRequestModel: VerifyOtpRequestModel): Response<VerifyOtpResponseModel>
+
+    @POST("/auth/forgot_password")
+    suspend fun forgotPassword(@Body forgotPasswordRequestModel: ForgotPasswordRequestModel): Response<ForgotPasswordResponseModel>
 }

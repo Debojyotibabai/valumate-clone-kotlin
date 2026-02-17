@@ -87,7 +87,6 @@ fun LoginScreen(
 
             is NetworkResponse.Success -> {
                 Toast.makeText(context, state.data.message, Toast.LENGTH_LONG).show()
-//                navHostController.navigate(MainRoutes.DASHBOARD)
                 loginViewModel.resetLoginState()
             }
 

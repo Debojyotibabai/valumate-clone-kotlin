@@ -1,5 +1,6 @@
 package com.example.valumate.screen
 
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -13,22 +14,76 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import com.example.valumate.R
+import com.example.valumate.model.ForgotPasswordRequestModel
 import com.example.valumate.navigation.MainRoutes
 import com.example.valumate.shared.CustomButton
 import com.example.valumate.shared.CustomText
 import com.example.valumate.shared.CustomTextField
 import com.example.valumate.ui.theme.AppColors
+import com.example.valumate.utils.AppRegex
+import com.example.valumate.utils.NetworkResponse
+import com.example.valumate.viewmodel.ForgotPasswordViewModel
 
 @Composable
-fun ForgotPasswordScreen(navHostController: NavHostController) {
+fun ForgotPasswordScreen(
+    navHostController: NavHostController,
+    forgotPasswordViewModel: ForgotPasswordViewModel = hiltViewModel()
+) {
+    val emailAddress = remember { mutableStateOf("") }
+    val emailAddressError = remember { mutableStateOf("") }
+
+    val forgotPasswordState = forgotPasswordViewModel.forgotPasswordState.collectAsState()
+
+    val context = LocalContext.current
+
+
+    fun forgotPassword() {
+        emailAddressError.value = ""
+
+        if (emailAddress.value.isEmpty()) {
+            emailAddressError.value = "Enter email address"
+            return
+        }
+
+        if (!AppRegex.emailRegex.matches(emailAddress.value)) {
+            emailAddressError.value = "Invalid email address"
+            return
+        }
+
+        forgotPasswordViewModel.forgotPassword(ForgotPasswordRequestModel(email_address = emailAddress.value))
+    }
+
+    LaunchedEffect(forgotPasswordState.value) {
+        when (val state = forgotPasswordState.value) {
+            is NetworkResponse.Error -> {
+                Toast.makeText(context, state.message, Toast.LENGTH_LONG).show()
+                forgotPasswordViewModel.resetForgotPasswordState()
+            }
+
+            is NetworkResponse.Success -> {
+                Toast.makeText(context, state.data.message, Toast.LENGTH_LONG).show()
+                forgotPasswordViewModel.resetForgotPasswordState()
+                navHostController.navigate(MainRoutes.RESET_PASSWORD_OTP)
+            }
+
+            else -> {}
+        }
+    }
+
     Column(
         verticalArrangement = Arrangement.Top,
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -68,14 +123,25 @@ fun ForgotPasswordScreen(navHostController: NavHostController) {
         Spacer(modifier = Modifier.height(50.dp))
         CustomTextField(
             placeholderText = "Enter your email",
-            leadingIcon = R.drawable.mail_icon
+            leadingIcon = R.drawable.mail_icon,
+            value = emailAddress.value,
+            onValueChange = {
+                emailAddress.value = it.trim()
+
+                if (!AppRegex.emailRegex.matches(it.trim())) {
+                    emailAddressError.value = "Invalid email address"
+                } else {
+                    emailAddressError.value = ""
+                }
+            }
         )
         Spacer(modifier = Modifier.weight(1f))
         CustomButton(
             onClick = {
-                navHostController.navigate(MainRoutes.RESET_PASSWORD_OTP)
+                forgotPassword()
             },
-            text = "Reset Password"
+            text = "Reset Password",
+            isLoading = forgotPasswordState.value is NetworkResponse.Loading
         )
         Spacer(modifier = Modifier.height(20.dp))
     }
